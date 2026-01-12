@@ -23,12 +23,36 @@ jobs:
           ssh -o StrictHostKeyChecking=no \
             -p ${{ secrets.SSH_PORT }} \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-          
+
           cd ${{ secrets.APP_PATH }}
+
+          # Pull latest code
           git pull origin dev
-          composer install --no-dev --optimize-autoloader
-          php artisan migrate --force
-          php artisan config:clear
-          php artisan config:cache
-          php artisan route:cache
+
+          # Copy .env if not exists
+          if [ ! -f .env ]; then
+            cp .env.example .env
+          fi
+
+          # Build and restart containers
+          docker-compose down
+          docker-compose build
+          docker-compose up -d
+
+          # Wait for containers to be ready
+          sleep 5
+
+          # Run Laravel setup inside container
+          docker-compose exec -T app composer install --no-dev --optimize-autoloader
+          docker-compose exec -T app php artisan key:generate --force
+          docker-compose exec -T app php artisan migrate --force
+          docker-compose exec -T app php artisan config:cache
+          docker-compose exec -T app php artisan route:cache
+          docker-compose exec -T app php artisan view:cache
+
+          # Set permissions
+          docker-compose exec -T app chown -R www-data:www-data /var/www/html/storage
+          docker-compose exec -T app chown -R www-data:www-data /var/www/html/bootstrap/cache
+
+          echo "Deployment completed successfully!"
           EOF
