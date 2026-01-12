@@ -28,6 +28,11 @@ COPY . .
 # Install dependencies without running scripts
 RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
 
+# Create bootstrap cache files
+RUN mkdir -p bootstrap/cache \
+    && echo '<?php return [];' > bootstrap/cache/packages.php \
+    && echo '<?php return [];' > bootstrap/cache/services.php
+
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
