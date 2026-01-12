@@ -22,19 +22,13 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy composer files first for caching
-COPY composer.json composer.lock ./
-
-# Install dependencies (skip scripts)
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
-
-# Copy application code
+# Copy all application code
 COPY . .
 
-# Set fake env for build
+# Install dependencies with fake env
 RUN cp .env.example .env \
+    && composer install --no-dev --optimize-autoloader \
     && php artisan key:generate \
-    && composer dump-autoload --optimize \
     && rm .env
 
 # Set permissions
