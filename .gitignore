@@ -10,3 +10,5 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
+github_deploy_rsa
+github_deploy_rsa.pub
