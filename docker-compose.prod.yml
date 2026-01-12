@@ -10,30 +10,8 @@ services:
       - .env
     ports:
       - "127.0.0.1:9900:9000"
-    networks:
-      - shorturl_network
-    depends_on:
-      - db
-
-  db:
-    image: mysql:8.0
-    container_name: shorturl_db
-    restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-shorturl}
-      MYSQL_USER: ${DB_USERNAME:-shorturl}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootsecret}
     volumes:
-      - db_data:/var/lib/mysql
-    ports:
-      - "127.0.0.1:3306:3306"
-    networks:
-      - shorturl_network
-
-networks:
-  shorturl_network:
-    driver: bridge
+      - storage_data:/var/www/html/storage
 
 volumes:
-  db_data:
+  storage_data:
