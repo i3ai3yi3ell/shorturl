@@ -75,10 +75,12 @@ jobs:
           docker compose -f docker-compose.prod.yml down
           docker compose -f docker-compose.prod.yml up -d
 
-          # Wait for containers to be ready
+          # Wait for container to be ready
           sleep 5
 
-          # Run Laravel setup
+          # Run Laravel setup (package:discover first, then other commands)
+          docker compose -f docker-compose.prod.yml exec -T app php artisan package:discover --ansi
+          docker compose -f docker-compose.prod.yml exec -T app php artisan key:generate --force
           docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force
           docker compose -f docker-compose.prod.yml exec -T app php artisan config:cache
           docker compose -f docker-compose.prod.yml exec -T app php artisan route:cache
