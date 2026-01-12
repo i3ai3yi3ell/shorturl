@@ -25,10 +25,9 @@ WORKDIR /var/www/html
 # Copy all application code
 COPY . .
 
-# Install dependencies with fake env
-RUN cp .env.example .env \
-    && composer install --no-dev --optimize-autoloader \
-    && php artisan key:generate \
+# Create .env with dummy key and install dependencies
+RUN echo "APP_KEY=base64:$(openssl rand -base64 32)" > .env \
+    && composer install --no-dev --optimize-autoloader --no-interaction \
     && rm .env
 
 # Set permissions
