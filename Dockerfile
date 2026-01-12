@@ -25,10 +25,8 @@ WORKDIR /var/www/html
 # Copy all application code
 COPY . .
 
-# Create .env with dummy key and install dependencies
-RUN echo "APP_KEY=base64:$(openssl rand -base64 32)" > .env \
-    && composer install --no-dev --optimize-autoloader --no-interaction \
-    && rm .env
+# Install dependencies without running scripts
+RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
