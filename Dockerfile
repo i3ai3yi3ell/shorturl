@@ -25,14 +25,17 @@ WORKDIR /var/www/html
 # Copy composer files first for caching
 COPY composer.json composer.lock ./
 
-# Install dependencies
+# Install dependencies (skip scripts)
 RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
 
 # Copy application code
 COPY . .
 
-# Generate autoloader and run post-install scripts
-RUN composer dump-autoload --optimize
+# Set fake env for build
+RUN cp .env.example .env \
+    && php artisan key:generate \
+    && composer dump-autoload --optimize \
+    && rm .env
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
