@@ -18,6 +18,12 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
+      - name: Debug SSH
+        run: |
+          echo "Testing SSH connection..."
+          ssh-add -l
+          ssh -vvv -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "echo 'SSH OK'"
+
       - name: Deploy to server
         run: |
           ssh -o StrictHostKeyChecking=no \
